@@ -1,0 +1,60 @@
+@startuml
+title FSM control.vhd (simple)
+
+hide empty description
+
+[*] --> INICIO
+
+INICIO --> LEE_MEM_PC
+LEE_MEM_PC --> CARGA_IR
+CARGA_IR --> DECODIFICA
+
+state DECODIFICA {
+}
+
+DECODIFICA --> LEE_MEM_DAT_INC_PC : op=0000011 (LOAD)
+DECODIFICA --> EJECUTA_I         : op=0010011 (I-ALU)
+DECODIFICA --> CALC_ADDR_STORE   : op=0100011 (STORE)
+DECODIFICA --> EJECUTA_R         : op=0110011 (R-ALU)
+DECODIFICA --> EVAL_BRANCH       : op=1100011 (BRANCH)
+DECODIFICA --> EJECUTA_LUI       : op=0110111 (LUI)
+DECODIFICA --> EJECUTA_AUIPC     : op=0010111 (AUIPC)
+DECODIFICA --> EJECUTA_JAL       : op=1101111 (JAL)
+DECODIFICA --> EJECUTA_JALR      : op=1100111 (JALR)
+DECODIFICA --> INICIO            : op=others
+
+LEE_MEM_DAT_INC_PC --> CARGA_RD_DE_MEM
+CARGA_RD_DE_MEM --> LEE_MEM_PC
+
+CALC_ADDR_STORE --> ESCRIBE_MEM_STORE
+ESCRIBE_MEM_STORE --> LEE_MEM_PC
+
+EJECUTA_R --> LEE_MEM_PC
+EJECUTA_I --> LEE_MEM_PC
+EVAL_BRANCH --> LEE_MEM_PC
+EJECUTA_LUI --> LEE_MEM_PC
+EJECUTA_AUIPC --> LEE_MEM_PC
+EJECUTA_JAL --> LEE_MEM_PC
+EJECUTA_JALR --> LEE_MEM_PC
+
+' --- básico de salidas por estado (muy corto) ---
+INICIO : defaults
+
+LEE_MEM_PC : data_addr=0
+CARGA_IR : winst=1
+
+LEE_MEM_DAT_INC_PC : addr=ALU(rs1+immI)\n(wpc=1)
+CARGA_RD_DE_MEM : wreg=1 (mem_source=1)
+
+CALC_ADDR_STORE : addr=ALU(rs1+immS)\n(wpc=1)
+ESCRIBE_MEM_STORE : wmem=1 (data_addr=1)
+
+EJECUTA_R : wreg=1 (ALU R)
+EJECUTA_I : wreg=1 (ALU I)
+EVAL_BRANCH : wpc=1, jump=take_branch
+EJECUTA_LUI : wreg=1
+EJECUTA_AUIPC : wreg=1
+EJECUTA_JAL : jump=1, wreg=1
+EJECUTA_JALR : jump=1, wreg=1
+
+@enduml

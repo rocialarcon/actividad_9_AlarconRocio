@@ -1,0 +1,8 @@
+# Reloj 12 MHz
+set_io clk_i 94
+set_io rst_i 31
+
+set_io leds_o[0] 1
+set_io leds_o[1] 2
+set_io leds_o[2] 3
+set_io leds_o[3] 4
