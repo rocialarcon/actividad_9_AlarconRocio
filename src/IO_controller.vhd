@@ -29,8 +29,20 @@ architecture arch of IO_controller is
 
 begin
     is_addr <= (base_addr(31 downto 4) = bus_addr(31 downto 4));
-    bus_sact <= '1' when is_addr else '0';
+   -- bus_sact <= '1' when is_addr else '0';--va dentro de un proceso
     bus_dsm <= (31 downto 4 => '0') & reg_leds;
+
+
+    process (clk)
+    begin 
+        if rising_edge(clk) then 
+            if is_addr then
+               bus_sact <= '1';
+            else
+               bus_sact <= '0';
+            end if;
+        end if;
+    end process;
 
     process (clk)
     begin

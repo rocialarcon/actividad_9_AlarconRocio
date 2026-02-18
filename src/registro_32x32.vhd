@@ -47,7 +47,7 @@ architecture arch of registro_32x32 is
 
     begin
         dout_1 <= reg(to_integer(unsigned(addr_1)));
-        dout_2 <= reg(to_integer(unsigned(addr_2)));
+        dout_2 <= reg(to_integer(unsigned(addr_2)));--dentro de un registro
 
         process(clk)
         begin
@@ -55,7 +55,7 @@ architecture arch of registro_32x32 is
                 if we_w = '1' and to_integer(unsigned(addr_w)) /= 0 then
                     reg(to_integer(unsigned(addr_w))) <= din_w;
                 end if ;
-                if to_integer(unsigned(addr_w)) = 0 then
+                if to_integer(unsigned(addr_w)) = 0 then--nos hace falta 
                     reg(0) <= (others => '0');
                 end if ;
             end if ;
