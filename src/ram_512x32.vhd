@@ -10,18 +10,16 @@ entity ram_512x32 is
     );
     port (
         clk     : in  std_logic;
-        --Puerto A lectura
-        addr_r : in std_logic_vector(8 downto 0);
-        dout_r : out std_logic_vector(31 downto 0);
-        --puerto b escritura
-        we_w      : in  std_logic;
-        addr_w    : in  std_logic_vector(8 downto 0);
-        din_w     : in  std_logic_vector(31 downto 0);
-        mask_w    : in std_logic_vector(3 downto 0)
+        addr : in std_logic_vector(8 downto 0);
+        we   : in  std_logic;
+        dout : out std_logic_vector(31 downto 0);
+        din    : in  std_logic_vector(31 downto 0);
+        mask   : in std_logic_vector(3 downto 0)
     );
 end entity ram_512x32;
 architecture arch of ram_512x32 is
-    type ram_type is array (511 downto 0) of std_logic_vector(31 downto 0);
+    type ram_type is array (0 to 511) of std_logic_vector(31 downto 0);
+    
     impure function init_ram return ram_type is
         file ram_file : text;
         variable ram_data : ram_type := (others => (others => '0'));
@@ -40,36 +38,34 @@ architecture arch of ram_512x32 is
                         addr_index := addr_index + 1;
                     end if ;
                 end loop; 
-                report "RAM: se cargaron" & integer'image (addr_index) & "palabras correctamente";
+                report "RAM: se cargaron " & integer'image (addr_index) & " palabras correctamente";
                 else
                 report "RAM ERROR:" & init_file
                 severity failure;            
-                end if ;
+            end if ;
         return ram_data;
-        end function init_ram;
+        end function;
+   
     signal ram : ram_type := init_ram;
     begin
-    dout_r <= ram(to_integer(unsigned(addr_r)));
-    --escritura con mascara
-    process(clk)
-        variable current_word : std_logic_vector(31 downto 0);
-        begin
+        process(clk)
+        begin 
             if rising_edge(clk) then
-                if we_w = '1' then
-                    current_word := ram(to_integer(unsigned(addr_w)));
-                    if mask_w(0) = '1' then
-                        current_word(7 downto 0) := din_w(7 downto 0);
+                dout <= ram(to_integer(unsigned(addr)));
+
+                if we = '1' then
+                    if mask(0) = '1' then
+                        ram(to_integer(unsigned(addr)))(7 downto 0) <= din(7 downto 0);
                     end if ;
-                    if mask_w(1) = '1' then
-                        current_word(15 downto 8) := din_w(15 downto 8);
+                    if mask(1) = '1' then
+                        ram(to_integer(unsigned(addr)))(15 downto 8) <= din(15 downto 8);
                     end if ;
-                    if mask_w(2) = '1' then
-                        current_word(23 downto 16) := din_w(23 downto 16);
+                    if mask(2) = '1' then
+                        ram(to_integer(unsigned(addr)))(23 downto 16) <= din(23 downto 16);
                     end if ;
-                    if mask_w(3) ='1' then
-                        current_word(31 downto 24) := din_w(31 downto 24);
+                    if mask(3) ='1' then
+                        ram(to_integer(unsigned(addr)))(31 downto 24) <= din(31 downto 24);
                     end if ;
-                    ram(to_integer(unsigned(addr_w))) <= current_word;
                 end if ;
             end if ;
         end process;

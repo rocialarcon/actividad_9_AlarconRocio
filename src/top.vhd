@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.tipos.all;
-
+use work.all;
 entity top is port (
     clk_i : in std_logic;
     rst_i : in std_logic;
@@ -101,15 +101,15 @@ begin
     );
 
     U_RAM : entity ram_512x32 generic map(
-        init_file => "programa.txt" 
-    )port map (
+        init_file => "../src/programa.txt"
+    )
+    port map (
         clk => slow_clk,
-        addr_r => ram_addr_c,
-        dout_r => ram_dout_c,
-        we_w => ram_we_c,
-        addr_w => ram_addr_c,
-        din_w => ram_din_c,
-        mask_w => ram_mask_c
+        addr => ram_addr_c,
+        dout => ram_dout_c,
+        we => ram_we_c,
+        din => ram_din_c,
+        mask => ram_mask_c
 
     );
 

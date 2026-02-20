@@ -68,9 +68,9 @@ begin
     -- x0 solo lectura
     rf_we <= wreg and (or rf_addr_w);
     pc_plus4 <= std_logic_vector(unsigned(pc) + 4);
-    rf_din <= bus_dsm when mem_source else 
-              imm_val when imm_source else 
-              pc_plus4 when jump else
+    rf_din <= bus_dsm when mem_source = '1' else 
+              imm_val when imm_source = '1' else 
+              pc_plus4 when jump = '1' else
               alu_y;
 
     U2 : entity registro_32x32 port map(
@@ -84,8 +84,8 @@ begin
         din_w => rf_din
     );
 
-    alu_a <= pc when s1pc else rf_dout_a;
-    alu_b <= imm_val when sel_imm else rf_dout_b;
+    alu_a <= pc when s1pc = '1' else rf_dout_a;
+    alu_b <= imm_val when sel_imm = '1' else rf_dout_b;
     
     U3 : entity alu 
         generic map( W => 32)
@@ -100,13 +100,13 @@ begin
     registros : process (clk)
     begin
         if rising_edge(clk) then
-            if not nreset then
+            if nreset = '0' then
                 pc <= (others=>'0');
                 ir <= (others => '0');
-            elsif wpc then
+            elsif wpc = '1' then
                 pc <= pc_next;
             end if;
-            if winst then
+            if winst = '1' then
                 ir <= bus_dsm;
             end if;
         end if;
@@ -118,9 +118,9 @@ begin
                pc_plus4;   
 
     -- Bus del sistema
-    bus_addr <= alu_y when data_addr else pc;
+    bus_addr <= alu_y when data_addr = '1' else pc;
     bus_dms <= rf_dout_b;
-    bus_twidth <= ir(14 downto 12) when data_addr else "010";
+    bus_twidth <= ir(14 downto 12) when data_addr = '1'else "010";
     bus_tms <= wmem;
 
     -- bloque de valor inmediato 
