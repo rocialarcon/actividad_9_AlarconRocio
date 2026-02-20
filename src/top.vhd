@@ -3,10 +3,11 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.tipos.all;
 use work.all;
+
 entity top is port (
     clk_i : in std_logic;
-    rst_i : in std_logic;
-    leds_o : out std_logic_vector(3 downto 0)
+    leds_o : out std_logic_vector(7 downto 0);
+    interruptores : in std_logic_vector(7 downto 0)
 );
 end top;
 
@@ -34,6 +35,8 @@ architecture arch of top is
     signal ram_addr_c : std_logic_vector(8 downto 0);
     signal ram_din_c : std_logic_vector(31 downto 0);
     signal ram_dout_c : std_logic_vector(31 downto 0);
+    --reset
+    signal sys_nreset : std_logic;
 begin
     process (clk_i)
     begin
@@ -43,9 +46,16 @@ begin
     end process;    
     slow_clk <= counter(22);
 
+
+    U_NRESET : entity reset_al_inicializar_fpga port map (
+        clk => slow_clk,
+        nreset_in => interruptores(7),
+        nreset_out => sys_nreset
+    );
+
     U_CPU : entity cpu port map (
         clk => slow_clk,
-        nreset => rst_i,
+        nreset => sys_nreset,
         bus_dsm => m_dsm,
         bus_addr => m_addr,
         bus_dms => m_dms,
@@ -87,11 +97,11 @@ begin
         ram_dout => ram_dout_c
     );
 
-    U_IO_CONTROLLER : entity IO_controller generic map (
+    U_O_CONTROLLER : entity O_controller generic map (
         base_addr => x"80000000"
     ) port map (
         clk => slow_clk,
-        nreset => rst_i,
+        nreset => sys_nreset,
         bus_addr => s_addr,
         bus_dms => s_dms,
         bus_tms => s_tms,
@@ -101,7 +111,7 @@ begin
     );
 
     U_RAM : entity ram_512x32 generic map(
-        init_file => "../src/programa.txt"
+        init_file => "../src/cuenta_en_display.txt"
     )
     port map (
         clk => slow_clk,

@@ -1,8 +1,21 @@
-# Reloj 12 MHz
 set_io clk_i 94
-set_io rst_i 31
 
-set_io leds_o[0] 1
-set_io leds_o[1] 2
-set_io leds_o[2] 3
-set_io leds_o[3] 4
+# Tablero de interruptores de 8 bits
+set_io interruptores[7] 24
+set_io interruptores[6] 23
+set_io interruptores[5] 22
+set_io interruptores[4] 21
+set_io interruptores[3] 16
+set_io interruptores[2] 15
+set_io interruptores[1] 12
+set_io interruptores[0] 11
+
+# Display de siete segmentos
+set_io leds_o[7] 124
+set_io leds_o[6] 134
+set_io leds_o[5] 129
+set_io leds_o[4] 135
+set_io leds_o[3] 130
+set_io leds_o[2] 128
+set_io leds_o[1] 122
+set_io leds_o[0] 125
