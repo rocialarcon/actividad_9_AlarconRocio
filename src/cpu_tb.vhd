@@ -86,17 +86,16 @@ begin
     );
 
     U_RAM : entity ram_512x32 generic map (
-        init_file => "../src/cpu_tb_prog3.txt"
+        init_file => "../src/cuenta_en_display_rapida.txt"
     ) port map (
         clk  => clk,
         --puerto d electura 
-        addr_r => ram_addr,
-        dout_r => ram_dout,
+        addr => ram_addr,
+        dout => ram_dout,
         --puerto de escritura 
-        we_w   => ram_we,
-        mask_w => ram_mask,
-        addr_w => ram_addr,
-        din_w => ram_din
+        we  => ram_we,
+        mask => ram_mask,
+        din => ram_din
     );
 
     MONITOR_BUS : process

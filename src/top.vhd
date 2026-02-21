@@ -12,9 +12,6 @@ entity top is port (
 end top;
 
 architecture arch of top is
-    --señales del reloj (divisor de frecuencia)
-    signal counter : unsigned(23 downto 0) :=(others =>'0');
-    signal slow_clk : std_logic;
     --bus maestro (CPU -> crosbar)
     signal m_addr : std_logic_vector(31 downto 0);
     signal m_dms : std_logic_vector(31 downto 0);
@@ -38,23 +35,15 @@ architecture arch of top is
     --reset
     signal sys_nreset : std_logic;
 begin
-    process (clk_i)
-    begin
-        if rising_edge(clk_i) then
-            counter <= counter + 1;
-        end if;
-    end process;    
-    slow_clk <= counter(22);
-
-
+    
     U_NRESET : entity reset_al_inicializar_fpga port map (
-        clk => slow_clk,
+        clk => clk_i,
         nreset_in => interruptores(7),
         nreset_out => sys_nreset
     );
 
     U_CPU : entity cpu port map (
-        clk => slow_clk,
+        clk => clk_i,
         nreset => sys_nreset,
         bus_dsm => m_dsm,
         bus_addr => m_addr,
@@ -83,7 +72,7 @@ begin
         ram_addr_nbits => 9,
         ram_base => x"00000000"
     ) port map (
-        clk => slow_clk,
+        clk => clk_i,
         bus_addr => s_addr,
         bus_dms => s_dms,
         bus_twidth => s_twidth,
@@ -100,7 +89,7 @@ begin
     U_O_CONTROLLER : entity O_controller generic map (
         base_addr => x"80000000"
     ) port map (
-        clk => slow_clk,
+        clk => clk_i,
         nreset => sys_nreset,
         bus_addr => s_addr,
         bus_dms => s_dms,
@@ -114,7 +103,7 @@ begin
         init_file => "../src/cuenta_en_display.txt"
     )
     port map (
-        clk => slow_clk,
+        clk => clk_i,
         addr => ram_addr_c,
         dout => ram_dout_c,
         we => ram_we_c,
